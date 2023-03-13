@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Subject, Subscription } from 'rxjs';
 import { Ingredient } from '../shared/ingredient.model';
 import { shoppingListService } from './shopping-list.service';
 
@@ -10,15 +11,26 @@ import { shoppingListService } from './shopping-list.service';
 })
 export class ShoppingListComponent {
   ingredients: Ingredient[];
+  private idChangeSub: Subscription;  
 
   constructor(private shoppingListService: shoppingListService) {}
 
   ngOnInit() {
     this.ingredients = this.shoppingListService.getIngredients();
-    this.shoppingListService.ingredientChange.subscribe(
+    this.idChangeSub = this.shoppingListService.ingredientChange.subscribe(
       (ingredients: Ingredient[]) => {
         this.ingredients = ingredients;
       }
     );
   }
+
+  
+  onEditItem(i: number){
+    this.shoppingListService.startedEditing.next(i)
+  }
+
+  ngOnDestroy(){
+    this.idChangeSub.unsubscribe()
+  }
+
 }
